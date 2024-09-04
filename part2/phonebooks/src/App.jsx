@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react'
+import axios from 'axios'
+import PersonService from './services/persons'
+
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import axios from 'axios'
+
 const App = () => {
-  const [persons, setPersons] = useState([
-    // { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    // { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    // { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    // { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [NewNumber, setNewNumber] = useState('')
   const [filterTerm, setFilterTerm] = useState('')
@@ -36,30 +34,48 @@ const App = () => {
     )
       setFilter(newPersons)
   }
-  useEffect(fetchHook,[])
+  useEffect(() => {
+    PersonService.getAll()
+    .then(intialPerson =>
+      setPersons(intialPerson)
+    )},[])
+    
   useEffect(personToFilterHook,[filterTerm,persons])
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    let collision = false
     persons.map(person => {
       if (person.name === newName){
-        alert(`${newName} is already added to phonebook`)
-        collision = true
+        const replace = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+        if(replace){
+          const updatePerson = {name:newName,number:NewNumber}
+          PersonService.update(person.id,updatePerson)
+          .then(update => 
+            setPersons(persons.map(person => person.id == update.id? update: person))
+          )
+        }
       }
-      if (person.number === NewNumber){
-        alert(`${NewNumber} is already added to phonebook`)
-        collision = true
+      else{
+        const newPerson = {name:newName,number:NewNumber}
+        PersonService.create(newPerson)
+        .then(PersonData => {
+          setPersons([...persons, PersonData])
+        })
       }
     })
-    if(!collision){
-      setPersons([...persons, {name:newName,number:NewNumber}])
-      
-    }
     setNewName('');
     setNewNumber('');
   }
 
+  const handleRemove = (person) => {
+    const remove = window.confirm(`Delete ${person.name}?`)
+    if(remove){
+      PersonService.remove(person.id)
+      .then(hidden => 
+        setPersons(persons.filter(p => p.id !== hidden.id))
+      )
+    }
+  }
   return (
     <div>
       <h2>Phonebook</h2>
@@ -73,7 +89,7 @@ const App = () => {
         numberValue={NewNumber}
       />
       <h2>Numbers</h2>
-       <Persons persons={filter}/>
+       <Persons persons={filter} onRemove={handleRemove}/>
     </div>
   )
 }

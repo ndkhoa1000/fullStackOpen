@@ -1,10 +1,13 @@
 import React from 'react'
 
-export default function Persons({persons}) {
+export default function Persons({persons,onRemove}) {
   return (
     <div>
-        {persons.map(person => 
-        <p key={person.name}>{person.name} {person.number}</p>
+        {persons.map(person =>
+            <p 
+            key={person.id}>{person.name} {person.number} 
+            <button key= {person.id} onClick={()=> onRemove(person)}>delete</button>
+            </p>
         )}
     </div>
   )
