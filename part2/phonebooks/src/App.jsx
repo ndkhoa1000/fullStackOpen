@@ -5,6 +5,8 @@ import PersonService from './services/persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
+import './index.css'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -12,6 +14,7 @@ const App = () => {
   const [NewNumber, setNewNumber] = useState('')
   const [filterTerm, setFilterTerm] = useState('')
   const [filter, setFilter] = useState(persons)
+  const [message,setMessage] = useState({status:'0',content:null})
 
   const handleNewNameChange = (event) => {
     setNewName(event.target.value)
@@ -21,12 +24,6 @@ const App = () => {
   }
   const handleFilterChange = (event) => {
     setFilterTerm(event.target.value)
-  }
-  const fetchHook = () => {
-    axios.get('http://localhost:3001/persons')
-    .then(res => {
-      setPersons(res.data)
-    })
   }
   const personToFilterHook = () => {
     const newPersons = persons.filter(person => 
@@ -41,28 +38,46 @@ const App = () => {
     )},[])
     
   useEffect(personToFilterHook,[filterTerm,persons])
+//support function for handleSubmit()
 
   const handleSubmit = (event) => {
     event.preventDefault()
+    let caseSubmit = 'create'
+    //case: update
     persons.map(person => {
       if (person.name === newName){
+        caseSubmit = 'update'
         const replace = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
         if(replace){
           const updatePerson = {name:newName,number:NewNumber}
           PersonService.update(person.id,updatePerson)
-          .then(update => 
+          .then(update => {
             setPersons(persons.map(person => person.id == update.id? update: person))
+            setMessage({status:'success',
+              content:`updated ${update.name}`
+            })
+            setTimeout(()=>{
+              setMessage({status:'0',content:null})
+            },5000)
+          }
           )
         }
       }
-      else{
-        const newPerson = {name:newName,number:NewNumber}
-        PersonService.create(newPerson)
-        .then(PersonData => {
-          setPersons([...persons, PersonData])
-        })
-      }
     })
+    //case: create
+    if(caseSubmit =='create'){
+      const newPerson = {name:newName,number:NewNumber}
+      PersonService.create(newPerson)
+      .then(PersonData => {
+        setPersons([...persons, PersonData])
+        setMessage({status:'success',
+          content:`Added ${PersonData.name}`
+        })
+        setTimeout(()=>{
+          setMessage({status:'0',content:null})
+        },5000)
+      })
+    }
     setNewName('');
     setNewNumber('');
   }
@@ -79,6 +94,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification status={message.status} content={message.content}/>
       <Filter onChange={handleFilterChange}/>
       <h2>add a new</h2>
       <PersonForm 
