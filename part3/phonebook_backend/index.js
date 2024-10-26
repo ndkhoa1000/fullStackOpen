@@ -77,8 +77,6 @@ app.post('/api/persons',(req,res) => {
     console.log(data)
     res.sendStatus(200)
 })
-const PORT = 3001
+const PORT = process.env.PORT || 3000
 app.listen(PORT)
 console.log(`server running on port ${PORT}`)
-
-const hello = []
