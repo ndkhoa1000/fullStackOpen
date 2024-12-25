@@ -76,7 +76,7 @@ app.post('/api/persons',(req,res) => {
     const newContact = {"id": id,"name": name,"number":number}
     data = data.concat(newContact)
     console.log(data)
-    res.sendStatus(200).json(newContact)
+    res.status(200).json(newContact)
 })
 const PORT = process.env.PORT || 3000
 app.listen(PORT)
