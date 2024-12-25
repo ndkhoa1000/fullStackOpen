@@ -75,7 +75,7 @@ app.post('/api/persons',(req,res) => {
     const id = Math.round(Math.random()*10000).toString()
     data = data.concat({"id": id,"name": name,"number":number})
     console.log(data)
-    res.sendStatus(200)
+    res.sendStatus(200).json(data)
 })
 const PORT = process.env.PORT || 3000
 app.listen(PORT)
