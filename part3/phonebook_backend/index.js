@@ -59,8 +59,8 @@ app.get('/api/persons/:id', (req,res) => {
 
 app.delete('/api/persons/:id', (req, res) => {
     const id = req.params.id
-    persons = data.filter(person => person.id !== id)
-    res.json(persons)
+    data = data.filter(person => person.id !== id)
+    res.json(data)
 })
 app.post('/api/persons',(req,res) => {
     const body = req.body
