@@ -57,11 +57,6 @@ app.get('/api/persons/:id', (req,res) => {
         res.status(404).end()
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-    const id = req.params.id
-    data = data.filter(person => person.id !== id)
-    res.json(data)
-})
 app.post('/api/persons',(req,res) => {
     const body = req.body
     if(!body.name || !body.number){
@@ -78,6 +73,23 @@ app.post('/api/persons',(req,res) => {
     console.log(data)
     res.status(200).json(newContact)
 })
+app.delete('/api/persons/:id', (req, res) => {
+    const id = req.params.id
+    data = data.filter(person => person.id !== id)
+    res.json(data)
+})
+app.put('/api/persons/:id', (req, res) => {
+    const id = req.params.id
+    const { name, number } = req.body
+    const index = data.findIndex(person => person.id === id)
+    // If the person doesn't exist, return 404
+    if (index === -1) {
+        return res.status(404).json({ error: 'Person not found' })
+    }
+    data[index] = { ...data[index], name, number }
+    res.json(data[index])
+})
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT)
 console.log(`server running on port ${PORT}`)
