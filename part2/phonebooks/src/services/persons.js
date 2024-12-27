@@ -1,23 +1,27 @@
 import axios from "axios";
-const baseUrl = process.env.BASE_URL
-
-const getAll = () => {
-    const request = axios.get(baseUrl)
-    return request.then(res => res.data)
+const baseUrl = import.meta.env.VITE_BASE_URL
+console.log(baseUrl)
+const getAll = async() => {
+    const request = await axios.get(baseUrl).then(res => res.data)
+    console.log(request)
+    return await request
 }
 
-
-const create = (newObject) => {
-    const request = axios.post(baseUrl,newObject)
-    return request.then(res => res.data)
+const create = async(newObject) => {
+    const request = await axios.post(baseUrl,newObject).then(res => res.data)
+    console.log(request)
+    return request
 }
 
-const remove = (id) => {
-    const request = axios.delete(`${baseUrl}/${id}`)
-    return request.then(res => res.data)
+const remove = async (id) => {
+    const request = await axios.delete(`${baseUrl}/${id}`).then(res => res.data)
+    console.log(request)
+    return request
 }
-const update = (id, object) => {
-    const request = axios.put(`${baseUrl}/${id}`, object)
-    return request.then(res => res.data)
+const update = async(id, object) => {
+    const request = await axios.put(`${baseUrl}/${id}`, object)
+    .then(res => res.data)
+    console.log(request)
+    return request
 }
 export default {getAll, create, remove, update}
